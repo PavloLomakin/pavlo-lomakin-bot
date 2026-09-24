@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pavlo Lomakin bot - цифровой двойник</title>
+<style>
+  :root { --bg: #101014; --panel: #17171d; --line: #2a2a33; --text: #f2f2f5; --muted: #9a9aa5; --accent: #4da3ff; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, "Segoe UI", Roboto, sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
+  header { padding: 18px 16px 12px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 12px; }
+  header img.avatar { width: 48px; height: 48px; border-radius: 50%; }
+  header .t h1 { font-size: 18px; }
+  header .t p { font-size: 13px; color: var(--muted); margin-top: 2px; }
+  header a.threads { margin-left: auto; color: var(--accent); font-size: 13px; text-decoration: none; white-space: nowrap; }
+  main { flex: 1; display: flex; flex-direction: column; max-width: 720px; width: 100%; margin: 0 auto; padding: 0 12px; }
+  #faq { padding: 12px 0 4px; }
+  #faq h2 { font-size: 14px; color: var(--muted); margin-bottom: 8px; font-weight: 600; }
+  #faq .grid { display: flex; flex-wrap: wrap; gap: 8px; }
+  #faq button { background: var(--panel); border: 1px solid var(--line); color: var(--text); border-radius: 20px; padding: 8px 14px; font-size: 13px; cursor: pointer; text-align: left; }
+  #faq button:active { background: #22222b; }
+  #chat { flex: 1; overflow-y: auto; padding: 12px 0; display: flex; flex-direction: column; gap: 10px; min-height: 200px; }
+  .msg { max-width: 85%; padding: 10px 14px; border-radius: 16px; font-size: 14px; line-height: 1.5; white-space: pre-wrap; }
+  .msg.user { align-self: flex-end; background: var(--accent); color: #fff; border-bottom-right-radius: 4px; }
+  .msg.bot { align-self: flex-start; background: var(--panel); border: 1px solid var(--line); border-bottom-left-radius: 4px; }
+  .msg.bot .links { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line); }
+  .msg.bot .links span { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  .msg.bot .links a { display: block; color: var(--accent); font-size: 13px; text-decoration: none; margin: 3px 0; }
+  .msg.typing { color: var(--muted); font-style: italic; }
+  #inputbar { display: flex; gap: 8px; padding: 12px 0 16px; }
+  #inputbar input { flex: 1; background: var(--panel); border: 1px solid var(--line); color: var(--text); border-radius: 24px; padding: 12px 16px; font-size: 14px; outline: none; }
+  #inputbar button { background: var(--accent); color: #fff; border: none; border-radius: 24px; padding: 0 20px; font-size: 14px; cursor: pointer; }
+  footer { text-align: center; padding: 10px 16px 20px; font-size: 12px; color: var(--muted); max-width: 720px; margin: 0 auto; }
+</style>
+</head>
+<body>
+<header>
+  <img class="avatar" src="https://avatars.githubusercontent.com/u/37935844?v=4" alt="Pavlo Lomakin">
+  <div class="t">
+    <h1>Pavlo Lomakin bot</h1>
+    <p>Цифровой двойник: отвечаю на основе моих постов в Threads</p>
+  </div>
+  <a class="threads" href="https://www.threads.com/@pavlo.lomakin" target="_blank" rel="noopener">Мой Threads</a>
+</header>
+<main>
+  <section id="faq">
+    <h2>Популярные вопросы - нажмите, чтобы увидеть ответ</h2>
+    <div class="grid" id="faqGrid"></div>
+  </section>
+  <div id="chat"></div>
+  <div id="inputbar">
+    <input id="q" type="text" placeholder="Спросите о моих взглядах на акции..." autocomplete="off">
+    <button id="send">➤</button>
+  </div>
+</main>
+<footer>Ответы собраны из публичных постов @pavlo.lomakin в Threads. Это не инвестиционные рекомендации - решения Вы принимаете сами.</footer>
+<script>
+const QA = [{"answer": "Моя цель измерима: обогнать QQQ по полной доходности (с реинвестированными дивидендами) на горизонте 10 лет - с сентября 2026 по сентябрь 2036.\n\nИзмеряю результат честно, по методике TWR (взвешенная по времени доходность), которую показывают брокеры. Так я исключаю влияние пополнений и снятий.\n\nВнутри портфеля держу концентрированный набор компаний с понятным бизнесом. Ставка - на несколько сильных идей, а не на распыление по сотне тикеров.\n\nЯ не даю рекомендаций покупать или продавать. Это аналитика и факты, решения Вы принимаете сами.", "keywords": ["стратегия", "цель", "qqq", "доходность", "подход", "философия", "стратегия инвестирования"], "post_links": [{"label": "Сравнение стратегий инвестирования (Schwab)", "url": "https://www.threads.com/@pavlo.lomakin/post/DPIDKzIgGSm"}, {"label": "Избегать глупых ошибок", "url": "https://www.threads.com/@pavlo.lomakin/post/DdXrgK4gOP0"}], "question": "В чём суть Вашей инвестиционной стратегии?"}, {"answer": "Топ-3 позиции (META, MSFT, FICO) - это около 74% портфеля. Так получается, когда веришь в несколько идей сильнее, чем в остальные.\n\nКонцентрация - это осознанный выбор. Размытый портфель из 50 акций даёт средний результат рынка минус комиссии. Сконцентрированный даёт шанс обогнать рынок - ценой более высокой волатильности.\n\nЯ принимаю эту волатильность как плату за потенциальное опережение. Просадки отдельных позиций - нормальная часть такого подхода, а не повод паниковать.\n\nКаждая крупная позиция должна проходить жёсткий фильтр: понятный бизнес, умеренный долг, стабильный свободный денежный поток.", "keywords": ["концентрация", "портфель", "meta", "msft", "fico", "диверсификация", "позиции"], "post_links": [{"label": "Справедливая стоимость META и MSFT", "url": "https://www.threads.com/@pavlo.lomakin/post/Ddh9snDAO-Z"}, {"label": "Избегать глупых ошибок", "url": "https://www.threads.com/@pavlo.lomakin/post/DdXrgK4gOP0"}], "question": "Почему Ваш портфель такой концентрированный?"}, {"answer": "У меня простой фильтр из четырёх пунктов.\n\n- Понятный бизнес. Я должен объяснить простыми словами, как компания зарабатывает деньги.\n- Умеренный долг. Компания не должна зависеть от постоянного рефинансирования.\n- Стабильный Free Cash Flow. Прибыль на бумаге - это хорошо, живые деньги - лучше.\n- Понятное конкурентное преимущество. То, что мешает конкурентам просто скопировать бизнес.\n\nЕсли хотя бы один пункт не проходит - акция не попадает в портфель, какой бы модной она ни была.\n\nЭтот подход не гарантирует, что я не ошибусь. Он гарантирует, что ошибки будут редкими и не смертельными.", "keywords": ["отбор", "критерии", "free cash flow", "конкурентное преимущество", "бизнес", "долг"], "post_links": [{"label": "Избегать глупых ошибок", "url": "https://www.threads.com/@pavlo.lomakin/post/DdXrgK4gOP0"}], "question": "Как Вы отбираете акции для портфеля?"}, {"answer": "Постоянно пытаться избегать глупых ошибок - гораздо эффективнее, чем пытаться быть супер-умным.\n\nИнвестор, который просто покупает стабильные компании и не делает глупостей, может не поймать 10-кратный рост одной рискованной акции.\n\nНо за счёт отсутствия нулей и тяжёлых убытков его долгосрочный результат оказывается выше, чем у 90% любителей «поймать иксы».\n\nМатематика проста: потерять 50% - значит нужно +100%, чтобы вернуться. Избегание крупных потерь важнее поиска крупных выигрышей.", "keywords": ["ошибки", "риск", "иксы", "дисциплина", "баффет"], "post_links": [{"label": "Избегать глупых ошибок", "url": "https://www.threads.com/@pavlo.lomakin/post/DdXrgK4gOP0"}], "question": "Что важнее - избегать ошибок или искать иксы?"}, {"answer": "Центр финансовых исследований Schwab проверил это на данных 2005-2024: $2000 в год в индекс S&P 500.\n\nИдеальный тайминг (покупать в самый дешёвый день года) дал бы +365%. Но угадать идеальный момент невозможно - это не стратегия, а фантазия.\n\nА вот дальше интересно: покупать сразу в первый день года дало +326%, а равномерные вложения каждый месяц (DCA) - +316%. Разница между «сразу» и «по частям» - всего 10 процентных пунктов за 20 лет.\n\nГлавный вывод: почти всегда лучше инвестировать (даже в пиковые моменты), чем не инвестировать совсем. Не вложив ничего, Вы бы остались с $40 000 вместо $166 000+.\n\nDCA - хороший вариант, если Вы склонны переживать после краткосрочного падения или предпочитаете вкладывать по мере заработка. Но ждать «идеального момента» - худшая из стратегий.", "keywords": ["тайминг", "вход", "dca", "усреднение", "момент", "schwab", "исследование", "когда покупать", "когда входить", "ждать", "лучший момент", "когда лучше покупать", "когда лучше входить"], "post_links": [{"label": "Сравнение стратегий инвестирования, часть 1", "url": "https://www.threads.com/@pavlo.lomakin/post/DPIDKzIgGSm"}, {"label": "Результаты стратегий: выводы", "url": "https://www.threads.com/@pavlo.lomakin/post/DPIDLGzgAIN"}], "question": "Стоит ли ждать удачного момента, чтобы войти в рынок?"}, {"answer": "Справедливая стоимость (fair value) - это оценка того, сколько акция должна стоить по фундаментальным показателям: денежные потоки, рост, риски.\n\nЯ смотрю на оценки Morningstar. Например: META торговалась по $665 при справедливой стоимости $850 - потенциал +27%. MSFT - $494 при справедливой $600, потенциал +21%.\n\nРазница между ценой и справедливой стоимостью - это мой запас прочности. Чем он больше, тем спокойнее держать позицию.\n\nВажно: это просто аналитика, никаких гарантий роста цены нет. Оценка может быть неверной, а рынок - иррациональным дольше, чем Вы готовы ждать.", "keywords": ["справедливая стоимость", "fair value", "morningstar", "оценка", "upside", "потенциал"], "post_links": [{"label": "Справедливая стоимость META и MSFT", "url": "https://www.threads.com/@pavlo.lomakin/post/Ddh9snDAO-Z"}], "question": "Что такое справедливая стоимость и как Вы её используете?"}, {"answer": "Пример из моего портфеля: когда многие фиксировали ServiceNow (NOW) по $125, я держал.\n\nЧувствовал себя при этом дураком - это нормально. Падение позиции всегда неприятно, даже когда ты уверен в тезисе.\n\nНо я не просто держал - я докупал. Если тезис не сломан, а цена упала, это скидка, а не катастрофа.\n\nВ итоге цена дошла до моего прогноза в $133. Дуракам везёт - но везёт тем дуракам, у которых был план и которые его держали.\n\nПравило: пересматривайте тезис, а не цену. Если бизнес не изменился - падение это возможность. Если тезис сломан - выходите, не ждите отскока.", "keywords": ["падение", "просадка", "держать", "докупать", "now", "servicenow", "убыток"], "post_links": [{"label": "История с ServiceNow: держал и докупал", "url": "https://www.threads.com/@pavlo.lomakin/post/DdjpBr7kddD"}], "question": "Что Вы делаете, когда акция падает после Вашей покупки?"}, {"answer": "Я пишу в первую очередь для себя. Публичные посты - это способ зафиксировать мысли и лучше понять собственные решения.\n\nКогда излагаешь тезис письменно, сразу видно, где логика, а где самообман. Это бесплатный аудит собственного мышления.\n\nРост аудитории - не цель. У меня в профиле честно написано: не профи, не аналитик, не коуч.\n\nЕсли мои разборы кому-то полезны - отлично. Но пишу я их, чтобы через год вернуться и проверить: был ли я прав и почему.", "keywords": ["блог", "публичность", "мотивация", "аудитория", "зачем"], "post_links": [{"label": "Справедливая стоимость META и MSFT (PS: это просто аналитика)", "url": "https://www.threads.com/@pavlo.lomakin/post/Ddh9snDAO-Z"}], "question": "Зачем Вы публикуете свой портфель и цифры публично?"}, {"answer": "Расстановка сил сейчас такая: Amazon владеет около 20% Anthropic, Google - около 15% плюс долговые обязательства, Microsoft - около 25% OpenAI плюс малая доля Anthropic.\n\nПолучается альянс AMZN + GOOG против MSFT - по крайней мере, если считать через ставки на лаборатории.\n\nПараллельно идёт гонка капексов: гиперскейлеры вкладывают десятки миллиардов в ИИ-инфраструктуру. Об этом подробно пишет BIS в работе «The AI Investment Race».\n\nМоё мнение: победит не тот, у кого лучшая модель сегодня, а тот, у кого дешевле инференс и шире дистрибуция. Модели дешевеют, инфраструктура - нет.", "keywords": ["ии", "ai", "гонка", "anthropic", "openai", "amazon", "google", "microsoft", "капекс", "гиперскейлеры", "гонки", "кто победит"], "post_links": [{"label": "Альянс AMZN с GOOGL против MSFT", "url": "https://www.threads.com/@pavlo.lomakin/post/DdY7NK6kTSX"}], "question": "Как Вы видите расстановку сил в AI-гонке гиперскейлеров?"}, {"answer": "Вопрос не праздный: по макроисследованиям 75-84% населения Земли (больше 6 миллиардов человек) никогда не пробовали ИИ или не пользуются им регулярно. И это при том, что GPT-3 вышел больше 5 лет назад.\n\nПроникновение идёт медленно. Сколько лет понадобится ИИ-ботам, чтобы серьёзно подкосить рекламную выручку Amazon? Возможно, очень много.\n\nА ещё есть второй сценарий: вместо человеческой рекламы появится «реклама» для ИИ-ботов - в той форме, которую воспринимают боты.\n\nПлатная приоритезация в выдаче по API. Оптимизация описаний товаров под ИИ-бота. И другие формы, которых мы пока не придумали.\n\nТо есть угроза может превратиться в новый рекламный инвентарь - и Amazon снова окажется в выигрыше.", "keywords": ["amazon", "реклама", "ии-боты", "угроза", "anthropic"], "post_links": [{"label": "Угрожают ли ИИ-боты рекламе Amazon", "url": "https://www.threads.com/@pavlo.lomakin/post/Ddm64iaAD5h"}, {"label": "Реклама для ИИ-ботов", "url": "https://www.threads.com/@pavlo.lomakin/post/DdnGACZgPT1"}], "question": "Угрожают ли ИИ-боты рекламному бизнесу Amazon?"}, {"answer": "В 2013 году Нобелевскую премию по экономике дали сразу троим за работы на одну и ту же тему - и они не согласны друг с другом.\n\nЮджин Фама - отец гипотезы эффективного рынка (EMH): цены отражают всю доступную информацию, обыграть рынок невозможно.\n\nРоберт Шиллер - исследователь пузырей и иррациональности: рынки регулярно сходят с ума из-за поведенческих отклонений.\n\nЛарс Питер Хансен - математик, создатель GMM (метода проверки экономических моделей на данных, когда обычные методы не работают). Он стоит между ними.\n\nМоё мнение: рынок в целом эффективен, но не всегда. Неэффективности существуют - иначе не было бы ни пузырей, ни моей цели обогнать QQQ. Вопрос только в том, хватит ли у Вас дисциплины их использовать, а не в том, существуют ли они.", "keywords": ["эффективный рынок", "emh", "нобелевская", "фама", "шиллер", "хансен", "пузыри"], "post_links": [{"label": "Три нобелевских лауреата, которые не согласны друг с другом", "url": "https://www.threads.com/@pavlo.lomakin/post/DdozQ5fkXqw"}, {"label": "Фама, Шиллер, Хансен - кто есть кто", "url": "https://www.threads.com/@pavlo.lomakin/post/Ddozf7DEfqY"}], "question": "Вы верите в гипотезу эффективного рынка?"}, {"answer": "Нет. И это принципиальная позиция.\n\nЯ публикую аналитику, факты и свои рассуждения - например, сравнение рыночной цены со справедливой стоимостью. Но это не призыв к действию.\n\nВ моём профиле написано честно: не профи, не аналитик, не коуч. У меня нет лицензии, и я не хочу, чтобы кто-то копировал мои сделки вслепую.\n\nМои цели, горизонт и терпимость к риску - мои. Ваши могут отличаться. Решение всегда за Вами.", "keywords": ["рекомендации", "советы", "покупать", "продавать", "дисклеймер"], "post_links": [{"label": "Справедливая стоимость META и MSFT (PS: это просто аналитика)", "url": "https://www.threads.com/@pavlo.lomakin/post/Ddh9snDAO-Z"}], "question": "Даёте ли Вы рекомендации покупать или продавать акции?"}, {"answer": "Бенчмарк - QQQ, полная доходность с реинвестированными дивидендами. Горизонт - 10 лет, с сентября 2026 по сентябрь 2036.\n\nМетодология - TWR, взвешенная по времени доходность. Она убирает влияние моих пополнений и снятий и показывает именно качество инвестиционных решений.\n\nПочему это важно: брокеры обычно показывают MWR (взвешенную по деньгам), которая смешивает результат решений с таймингом пополнений. Для честного сравнения с индексом нужен TWR.\n\nПромежуточные цифры я тоже фиксирую публично - например, когда цена доходит до моих прогнозов. Это держит меня честным перед самим собой.", "keywords": ["результат", "доходность", "twr", "qqq", "бенчмарк", "измерение", "портфель"], "post_links": [{"label": "Результаты стратегий: как считать доходность", "url": "https://www.threads.com/@pavlo.lomakin/post/DPIDLGzgAIN"}, {"label": "История с ServiceNow: цена дошла до прогноза", "url": "https://www.threads.com/@pavlo.lomakin/post/DdjpBr7kddD"}], "question": "Как Вы измеряете свой инвестиционный результат?"}];
+
+function norm(s) {
+  return s.toLowerCase().replace(/ё/g, "е").replace(/[^a-zа-я0-9\s-]/g, " ").replace(/\s+/g, " ").trim();
+}
+function tokens(s) { return norm(s).split(" ").filter(function(w){ return w.length > 2; }); }
+
+function findAnswer(query) {
+  const nq = " " + norm(query) + " ";
+  const qToks = tokens(query);
+  let best = null, bestScore = 0;
+  QA.forEach(function(entry) {
+    let s = 0;
+    entry.keywords.forEach(function(kw) {
+      const k = norm(kw);
+      if (!k) return;
+      if (nq.indexOf(k) !== -1) { s += k.length * 2; return; }
+      // word-form tolerance: shared 4-letter prefix for words of 5+ letters
+      if (k.length >= 5) {
+        const stem = k.slice(0, 4);
+        for (let i = 0; i < qToks.length; i++) {
+          const t = qToks[i];
+          if (t.length >= 5 && t.slice(0, 4) === stem) { s += 5; break; }
+        }
+      }
+    });
+    const eToks = new Set(tokens(entry.question));
+    qToks.forEach(function(t) { if (eToks.has(t)) s += 3; });
+    if (s > bestScore) { bestScore = s; best = entry; }
+  });
+  return bestScore >= 6 ? best : null;
+}
+
+const chat = document.getElementById("chat");
+const input = document.getElementById("q");
+
+function addMsg(cls, html) {
+  const d = document.createElement("div");
+  d.className = "msg " + cls;
+  d.innerHTML = html;
+  chat.appendChild(d);
+  chat.scrollTop = chat.scrollHeight;
+  return d;
+}
+function esc(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+function answerHtml(entry) {
+  let h = esc(entry.answer);
+  if (entry.post_links && entry.post_links.length) {
+    h += '<div class="links"><span>Читать в Threads:</span>';
+    entry.post_links.forEach(function(l) {
+      h += '<a href="' + esc(l.url) + '" target="_blank" rel="noopener">↗ ' + esc(l.label) + '</a>';
+    });
+    h += '</div>';
+  }
+  return h;
+}
+function ask(text) {
+  const q = (text || "").trim();
+  if (!q) return;
+  addMsg("user", esc(q));
+  input.value = "";
+  const t = addMsg("bot typing", "печатаю...");
+  setTimeout(function() {
+    t.remove();
+    const entry = findAnswer(q);
+    if (entry) {
+      addMsg("bot", answerHtml(entry));
+    } else {
+      addMsg("bot", "Не нашёл точного ответа в своей базе. Попробуйте переформулировать - или выберите вопрос из популярных выше, там точно есть ответ.");
+    }
+  }, 600);
+}
+
+document.getElementById("send").addEventListener("click", function(){ ask(input.value); });
+input.addEventListener("keydown", function(e){ if (e.key === "Enter") ask(input.value); });
+
+const grid = document.getElementById("faqGrid");
+QA.forEach(function(entry) {
+  const b = document.createElement("button");
+  b.textContent = entry.question;
+  b.addEventListener("click", function(){ ask(entry.question); });
+  grid.appendChild(b);
+});
+
+addMsg("bot", "Привет! Я цифровой двойник Павло Ломакина. Спросите меня о моих взглядах на акции - или выберите вопрос из популярных выше.");
+</script>
+</body>
+</html>
